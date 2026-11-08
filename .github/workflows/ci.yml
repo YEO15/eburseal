@@ -67,6 +67,9 @@ jobs:
   secrets:
     name: Recherche de secrets (SR-TST-05)
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: read
     steps:
       - uses: actions/checkout@v4
         with:
