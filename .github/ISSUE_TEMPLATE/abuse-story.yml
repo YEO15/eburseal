@@ -1,0 +1,27 @@
+name: Récit d'abus
+description: Décrire ce qu'un mal-acteur pourrait faire (point de vue de l'attaquant)
+title: "[CA-xx] "
+labels: ["abuse-story", "security"]
+body:
+  - type: input
+    id: ca
+    attributes: { label: Identifiant du cas d'abus, placeholder: "CA-12" }
+    validations: { required: true }
+  - type: textarea
+    id: story
+    attributes:
+      label: Récit d'abus
+      description: "En tant que <mal-acteur>, je peux <abuser du sujet> afin de <objectif>."
+    validations: { required: true }
+  - type: dropdown
+    id: cia
+    attributes:
+      label: Attributs de sécurité affectés
+      multiple: true
+      options: [Confidentialité, Intégrité, Disponibilité]
+  - type: textarea
+    id: entry
+    attributes: { label: Point d'entrée et pré-conditions }
+  - type: input
+    id: uc
+    attributes: { label: Cas d'utilisation / besoins menacés, placeholder: "BF-MED-02" }

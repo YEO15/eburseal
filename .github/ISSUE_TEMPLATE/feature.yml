@@ -1,0 +1,23 @@
+name: Besoin fonctionnel
+description: Fonctionnalité métier (BF-…)
+title: "[BF-xxx-nn] "
+labels: ["feature"]
+body:
+  - type: input
+    id: bf
+    attributes: { label: Identifiant, placeholder: "BF-STG-07" }
+    validations: { required: true }
+  - type: textarea
+    id: desc
+    attributes: { label: Description }
+    validations: { required: true }
+  - type: textarea
+    id: acceptance
+    attributes: { label: Critère d'acceptation }
+    validations: { required: true }
+  - type: textarea
+    id: abuse
+    attributes:
+      label: Cas d'abus associés
+      description: Shift-Left — quels CA menacent cette fonctionnalité ? (à rédiger AVANT le développement)
+    validations: { required: true }

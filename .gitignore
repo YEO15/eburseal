@@ -1,0 +1,21 @@
+# Java / Maven
+backend/target/
+*.class
+# Node / Vite
+frontend/node_modules/
+frontend/dist/
+# IDE / OS
+.idea/
+.vscode/
+*.iml
+.DS_Store
+# Documents : fichiers intermédiaires (les PDF finaux sont versionnés)
+docs/src/__pycache__/
+docs/src/diagrams/*.dot
+# Secrets — ne jamais versionner (SR-DEP-02)
+.env
+*.p12
+*.jks
+*.pem
+*.key
+frontend/*.tsbuildinfo

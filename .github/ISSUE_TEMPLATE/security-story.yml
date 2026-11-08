@@ -1,0 +1,32 @@
+name: Récit de sécurité / exigence
+description: Exigence de sécurité qui contre un récit d'abus (ajout ou évolution)
+title: "[SR-xxx-nn] "
+labels: ["security-story", "security"]
+body:
+  - type: input
+    id: sr
+    attributes: { label: Identifiant de l'exigence, placeholder: "SR-AUZ-08" }
+    validations: { required: true }
+  - type: textarea
+    id: story
+    attributes:
+      label: Récit de sécurité
+      description: "En tant que <acteur>, je veux <garantie> pour <raison>."
+    validations: { required: true }
+  - type: textarea
+    id: requirement
+    attributes:
+      label: Énoncé SMART de l'exigence
+      description: Spécifique, mesurable (seuil, algorithme), actionnable, réaliste, priorisé
+    validations: { required: true }
+  - type: input
+    id: origin
+    attributes: { label: "Origine (CA, risque, driver)", placeholder: "CA-02 / R-02" }
+  - type: textarea
+    id: verification
+    attributes: { label: Méthode de vérification (test prévu) }
+  - type: dropdown
+    id: chapter
+    attributes:
+      label: Chapitre du cours
+      options: ["Ch. 2", "Ch. 3", "Ch. 4", "Ch. 5", "Ch. 6", "Ch. 7"]
