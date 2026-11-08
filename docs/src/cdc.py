@@ -34,7 +34,7 @@ d.P("Le binôme est composé de <b>OUATTARA Yacouba</b> et <b>YEO Tanna Daouda</
 # =====================================================================
 d.H1("Contexte et problématique")
 d.H2("Le problème : la confiance dans les diplômes")
-d.P("En Côte d'Ivoire, la fraude aux diplômes est un problème public et récurrent. En 2025, 84 agents des Douanes ont été condamnés pour usage de faux diplômes. "
+d.P("En Côte d'Ivoire, la fraude aux diplômes est un problème public et récurrent. En juillet 2025, le tribunal de première instance d'Abidjan-Plateau a condamné 84 agents des Douanes à six mois de prison ferme pour usage de faux documents lors d'un concours professionnel exceptionnel (décision frappée d'appel ; sources : <i>Fraternité Matin</i> et <i>Connectionivoirienne</i>, 28/07/2025). "
     "Des étudiants d'écoles de formation ont été exclus pour la même raison, et les concours de la fonction publique signalent chaque année des candidats porteurs de faux diplômes. "
     "Aujourd'hui, vérifier un diplôme suppose de contacter l'établissement émetteur : c'est lent, rarement fait, et impossible à grande échelle.")
 d.P("EburSeal répond à <b>un seul problème</b> : <b>permettre à quiconque de savoir, en quelques secondes, si un diplôme ivoirien est authentique, intact et présenté par son vrai titulaire.</b> "
@@ -54,6 +54,7 @@ d.table([["Critère", "Watermarking (filigrane)", "Stéganographie (sceau caché
          ["Moteur", "DCT 8×8, blocs réservés à la couche filigrane", "DCT 8×8, blocs réservés au sceau", "DCT 8×8, blocs réservés à l'empreinte"],
          ["Question à laquelle elle répond", "« Cet établissement a-t-il émis ce document ? »", "« Le contenu a-t-il été modifié ? »", "« Cette copie m'était-elle destinée ? »"]],
         [3.3, 4.7, 4.7, 4.7])
+d.box("dans EburSeal, la stéganographie ne sert pas à cacher une conversation, mais à cacher <b>l'existence et l'emplacement</b> d'une preuve. Le sceau est placé à des positions secrètes et chiffré : sans la clé, rien ne le distingue du bruit de l'image (SR-CON-04). C'est bien de la stéganographie au sens du cours : le canal est dissimulé dans un support anodin. Ce qui change, c'est l'usage : le message caché est une <b>preuve d'intégrité signée</b>. Un faussaire ne peut ni la retirer proprement (il ne sait pas où elle est), ni la recopier sur un autre diplôme (elle est liée par signature aux données officielles).", "Pourquoi c'est bien de la stéganographie", kind="info")
 d.P("Les trois couches partagent <b>un seul moteur</b> (transformée en cosinus discrète par blocs 8×8, comme JPEG) mais occupent des <b>ensembles de blocs disjoints</b> tirés au sort par une clé secrète. "
     "C'est ce qui rend le projet réalisable par un binôme : un seul moteur à maîtriser, trois usages.")
 
@@ -152,7 +153,7 @@ d.table([["Code", "Domaine", "Exigence"],
          ["ENF-01", "Performance", "Émission d'un diplôme A4 (300 dpi) en moins de 15 s ; vérification en moins de 10 s (serveur 4 vCPU)"],
          ["ENF-02", "Performance", "Écrans de navigation en moins de 500 ms au 95<super>e</super> centile"],
          ["ENF-03", "Qualité d'image", "Marques imperceptibles : PSNR ≥ 40 dB par rapport au visuel déposé"],
-         ["ENF-04", "Robustesse", "Marques lisibles après JPEG qualité 75 et redimensionnement à 75 % (seuils validés par prototype au jalon J2)"],
+         ["ENF-04", "Robustesse", "Marques lisibles après JPEG qualité 75 et redimensionnement à 75 %, grâce à une resynchronisation géométrique avant extraction (seuils validés par prototype au jalon J2)"],
          ["ENF-05", "Compatibilité", "Deux dernières versions de Chrome, Firefox, Edge, Safari ; de 360 px à 1920 px de large ; connexions mobiles lentes (3G)"],
          ["ENF-06", "Ergonomie", "Interface en français ; contraste WCAG 2.1 AA ; verdict compréhensible par un non-spécialiste (couleur + texte)"],
          ["ENF-07", "Maintenabilité", "Couverture de tests ≥ 70 % sur les services métier et 90 % sur le moteur ; API documentée en OpenAPI 3.1"]],
@@ -173,7 +174,7 @@ d.table([["Couche", "Technologie", "Usage dans EburSeal"],
         [3.3, 4.2, 9.9])
 d.H2("Architecture cible")
 d.P("L'architecture est en trois couches. Le <b>moteur EburSeal</b> concentre la dissimulation ; il s'exécute dans une file de traitement bornée. Les clés ne quittent jamais le serveur.")
-d.img(str(HERE / "diagrams" / "architecture.png"), W, "Figure 1 — Architecture logique d'EburSeal")
+d.img(str(HERE / "diagrams" / "architecture.png"), W * 0.85, "Figure 1 — Architecture logique d'EburSeal")
 d.H2("Principales ressources de l'API REST")
 d.table([["Ressource", "Méthodes", "Rôles autorisés", "Besoins"],
          ["/api/auth/{activate, login, refresh, logout, reset, mfa}", "POST", "Public / authentifié", "BF-CPT-01 à 04"],
@@ -240,7 +241,7 @@ d.L(["ses critères d'acceptation (recueil, § 3) sont vérifiés par un test au
      "la pull request a été relue et approuvée par l'autre membre, et la matrice de traçabilité est à jour."])
 d.H2("Risques projet")
 d.table([["Risque projet", "Impact", "Parade"],
-         ["Robustesse des marques DCT insuffisante après recompression", "OM-2 partiellement atteint", "Prototype dès J2 sur un banc de 50 diplômes ; redondance et code correcteur ajustables"],
+         ["Robustesse des marques DCT insuffisante après recompression", "OM-2 partiellement atteint", "Prototype dès J2 sur un banc de 50 diplômes ; resynchronisation géométrique (réalignement sur la grille 8×8) ; redondance et code correcteur ajustables"],
          ["Capacité insuffisante pour trois couches sur un A4", "Sceau tronqué", "Rastérisation à 300 dpi (≈ 136 000 blocs) ; sceau compact (≈ 250 octets)"],
          ["Charge de travail (sécurité identique à un trinôme)", "Retard", "Priorisation AHP : P1 d'abord ; besoins « Could » abandonnables"],
          ["Évolution des exigences au fil du cours", "Incohérences documentaires", "Référentiel unique (data.py → PDF + CSV) régénéré à chaque évolution"]],

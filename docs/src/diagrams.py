@@ -47,7 +47,7 @@ digraph G {{
 # 2. Architecture
 render("architecture", f"""
 digraph G {{
- rankdir=LR; graph[{FONT}, fontsize=10, nodesep=0.3, ranksep=0.5]; node[{FONT}, fontsize=8.5, shape=box, style="rounded,filled", fillcolor="white", color="#14325C"]; edge[{FONT}, fontsize=7.5, color="#14325C"];
+ rankdir=TB; graph[{FONT}, fontsize=10, nodesep=0.3, ranksep=0.5]; node[{FONT}, fontsize=8.5, shape=box, style="rounded,filled", fillcolor="white", color="#14325C"]; edge[{FONT}, fontsize=7.5, color="#14325C"];
  subgraph cluster_c {{ label="Navigateur (PWA / SPA)"; style="rounded,filled"; fillcolor="#EEF4F9"; color="#2C7DA0";
   ui [label="Interface React + TypeScript\\n(titulaire, émetteur, vérificateur)"]; sw [label="Service Worker\\n(cache statique uniquement)"]; }}
  subgraph cluster_s {{ label="WildFly 42 — Jakarta EE 11 / Java 25"; style="rounded,filled"; fillcolor="#F5F6F8"; color="#14325C";

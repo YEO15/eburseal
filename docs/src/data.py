@@ -269,7 +269,7 @@ SEC = [
  # ---- INT
  ("SR-INT-01", "Un fichier déposé n'est accepté que si sa <b>signature binaire</b> est PDF, PNG ou JPEG, s'il fait ≤ <b>10 Mo</b>, ≤ <b>1 page</b> (PDF) et ≤ <b>7000 × 7000 px</b> (vérifié <b>avant</b> décodage), et s'il se décode entièrement.",
   "CA-08, CA-11", (3, 3, 2), "Jeu de tests : polyglotte, bombe d'image, faux MIME → rejet", "A05, A06", "V5"),
- ("SR-INT-02", "Les PDF déposés sont <b>rastérisés</b> à 300 dpi : JavaScript, formulaires, pièces jointes et liens du fichier d'origine ne sont jamais conservés ni servis ; le diplôme émis est un PDF reconstruit par la plateforme.",
+ ("SR-INT-02", "Les PDF déposés sont <b>rastérisés</b> à 300 dpi : JavaScript, formulaires, pièces jointes et liens du fichier d'origine ne sont jamais conservés ni servis ; le diplôme émis est un PDF reconstruit par la plateforme. La rastérisation ne protège pas le lecteur lui-même : l'analyse par <b>Apache PDFBox</b> s'exécute dans une tâche <b>isolée et bornée</b> (30 s, 512 Mo de tas, aucun accès réseau, répertoire temporaire dédié purgé), et PDFBox est maintenu à la dernière version corrective.",
   "CA-08", (3, 2, 2), "Test : PDF avec JavaScript → document émis sans contenu actif", "A05, A08", "V5"),
  ("SR-INT-03", "Chaque DTO d'entrée est validé par <b>Jakarta Validation</b> (types, longueurs, formats en liste blanche, dates cohérentes) ; toute requête non conforme est rejetée (400) avant traitement.",
   "CA-08", (3, 3, 3), "Tests d'API avec valeurs hors bornes", "A05", "V2"),
@@ -299,7 +299,7 @@ SEC = [
   "CA-01", (3, 2, 2), "Test : détection avec la clé d'un autre établissement → négatif", "A04", "V11"),
  ("SR-DIM-03", "Le sceau contient les données officielles, l'identifiant du diplôme et de l'établissement, <b>signés Ed25519</b> puis chiffrés, et protégés par un code correcteur ; une signature invalide rend le document « non authentique ».",
   "CA-02", (3, 2, 2), "Test : modification d'un octet du sceau → signature invalide", "A08", "V11"),
- ("SR-DIM-04", "Seuils de qualité : <b>PSNR ≥ 40 dB</b> pour l'ensemble des marques ; filigrane, sceau et empreinte lisibles après <b>JPEG qualité 75</b> et <b>redimensionnement à 75 %</b> (seuils à confirmer par le prototype J2).",
+ ("SR-DIM-04", "Seuils de qualité : <b>PSNR ≥ 40 dB</b> pour l'ensemble des marques ; filigrane, sceau et empreinte lisibles après <b>JPEG qualité 75</b> et <b>redimensionnement à 75 %</b> (seuils à confirmer par le prototype J2). Avant toute extraction, une étape de <b>resynchronisation géométrique</b> estime l'échelle et le décalage (motif de référence inséré par la plateforme) et réaligne l'image sur la grille 8×8 ; sans elle, un simple redimensionnement désaligne les blocs DCT et rend les marques illisibles.",
   "CA-01, CA-02, CA-07", (3, 2, 1), "Banc de test sur 50 diplômes de référence", "A06", "V2"),
  ("SR-DIM-05", "Verdict de vérification : <b>« authentique »</b> seulement si filigrane détecté ET sceau à signature valide ET statut non révoqué ET (si disponible) concordance avec le registre ; <b>« indéterminé »</b> si une marque est illisible ; sinon <b>« non authentique »</b>.",
   "CA-01, CA-02, CA-07", (3, 2, 2), "Tests de décision sur une matrice de cas", "A06, A10", "V2"),
