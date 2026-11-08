@@ -164,7 +164,7 @@ d.H1("SQUARE étape 3 : artefacts — la perspective de l'attaquant", newpage=Tr
 d.H2("Mal-acteurs")
 d.table([["Mal-acteur", "Profil et moyens"]] + [list(m) for m in D.MIS_ACTORS], [4.6, 12.8])
 d.H2("Diagramme des cas d'utilisation, d'abus et de sécurité")
-d.P("Le diagramme suit la notation du cours : les cas d'abus (en noir) <b>« threatens »</b> les cas d'utilisation qu'ils menacent ; les cas d'utilisation de sécurité (en vert) "
+d.P("Le diagramme suit la notation du cours : les cas d'abus (en noir) <b>« threatens »</b> les cas d'utilisation qu'ils menacent ; les cas d'utilisation de sécurité (en gris clair) "
     "<b>« mitigates »</b> les cas d'abus et sont <b>« include »</b> par les cas d'utilisation qu'ils protègent. Les cas d'abus CA-07 à CA-11, transverses, sont détaillés dans les fiches.")
 d.img(str(HERE / "diagrams" / "usecases.png"), W, "Figure 2 — Cas d'utilisation, cas d'abus et cas de sécurité principaux")
 d.H2("Fiches des cas d'abus")
