@@ -25,7 +25,7 @@ d.P("Ce cahier des charges est réalisé dans le cadre de l'atelier du module <b
 d.L(["le métier doit faire <b>la part belle aux services de dissimulation de l'information</b> : stéganographie, watermarking, fingerprinting ;",
      "le périmètre métier est <b>proportionnel à l'effectif</b> de l'équipe, alors que les exigences de sécurité sont <b>identiques pour toutes les équipes</b> ;",
      "les aspects de sécurité <b>suivent l'agenda du cours</b> (chapitres 2 à 7) : l'application s'enrichit au fil des séances."])
-d.P("La progression est suivie sur un dépôt <b>GitHub privé</b>, partagé avec l'encadrant. Ce document et le recueil des besoins sont déposés en PDF dans le répertoire <b>docs/</b>.")
+d.P("La progression est suivie sur un dépôt <b>GitHub public</b> (à la demande de l'encadrant, pour l'évaluation outillée). Ce document et le recueil des besoins sont déposés en PDF dans le répertoire <b>docs/</b>.")
 d.H2("Équipe")
 d.P("Le binôme est composé de <b>OUATTARA Yacouba</b> et <b>YEO Tanna Daouda</b>. Les responsabilités sont <b>partagées</b> : chaque membre intervient sur le socle de sécurité, "
     "le moteur de dissimulation et l'application cliente. La seule règle d'organisation est la <b>revue croisée</b> : aucune contribution n'est fusionnée sans avoir été relue "
@@ -205,7 +205,7 @@ d.box("le recueil des besoins est versionné et mis à jour à chaque séance (p
 d.H1("Organisation, livrables et planning")
 d.H2("Organisation du dépôt GitHub")
 d.table([["Élément", "Convention"],
-         ["Visibilité", "Dépôt <b>privé</b>, accès accordé à l'encadrant ; tous droits réservés aux auteurs"],
+         ["Visibilité", "Dépôt <b>public</b> (évaluation outillée par l'encadrant) ; tous droits réservés aux auteurs"],
          ["Arborescence", "backend/ (WAR Jakarta EE 11) · frontend/ (PWA) · docs/ (PDF + sources) · .github/ (CI, modèles d'issues et de PR)"],
          ["Branches", "<b>main</b> protégée (release, tag par séance) · <b>develop</b> (intégration) · feature/&lt;id-besoin&gt;-&lt;description&gt;"],
          ["Pull requests", "Relecture obligatoire par l'autre membre ; liste de contrôle sécurité ; CI verte obligatoire"],

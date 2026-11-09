@@ -8,7 +8,7 @@ Projet de l'atelier *Sécurité Applicative* — SUP'COM, 3ᵉ année cycle ing�
 Binôme : **OUATTARA Yacouba** · **YEO Tanna Daouda** (responsabilités partagées, revue croisée obligatoire).
 Encadrant : Dr. Ing. Mohamed-Becha Kaâniche.
 
-> 🔒 Dépôt **privé**, partagé avec l'encadrant. Tous droits réservés (voir [LICENSE](LICENSE)).
+> 🌐 Dépôt **public** (à la demande de l'encadrant, pour l'évaluation outillée). Tous droits réservés (voir [LICENSE](LICENSE)).
 
 ## Le problème
 

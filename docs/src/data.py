@@ -434,7 +434,7 @@ def export_csv(path):
     cat = {c[0]: c for c in CATS}
     clean = lambda s: re.sub("<[^>]+>", "", s).replace("&amp;", "&").replace("&lt;", "<").replace("&gt;", ">")
     with open(path, "w", newline="", encoding="utf-8") as f:
-        wr = csv.writer(f, delimiter=";")
+        wr = csv.writer(f, delimiter=",")
         wr.writerow(["id", "categorie", "chapitre", "enonce", "origine", "R", "C", "F", "score_ahp", "priorite",
                      "verification", "owasp_2025", "asvs_5", "statut", "version"])
         for r, s, p in prioritized():
