@@ -56,4 +56,4 @@ Conformément aux directives de l'atelier, l'usage de l'IA (ChatGPT, Claude, Git
 En inscrivant votre nom ci-dessous dans le commit de validation, vous signez électroniquement ce document et vous engagez sur l'exactitude des informations fournies.
 
 * **YEO Tanna Daouda** : Engagé / 09/11/2026
-* **OUATTARA Yacouba** : [À signer par Yacouba dans son propre commit]
+* **OUATTARA Yacouba** : Engagé / 10/11/2026
