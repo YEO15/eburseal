@@ -4,7 +4,7 @@ from vmpdf import Doc, W
 import data as D
 
 HERE = pathlib.Path(__file__).parent
-out = sys.argv[1] if len(sys.argv) > 1 else str(HERE.parent / "cahier-des-charges.pdf")
+out = sys.argv[1] if len(sys.argv) > 1 else str(HERE.parent / "cahier_des_charges.pdf")
 d = Doc(out, "Cahier des charges", "Application PWA/SPA — Jakarta EE 11 · WildFly 42 · Java 25", D.VERSION, "cdc")
 
 d.cover([
@@ -12,7 +12,7 @@ d.cover([
     ("Équipe (binôme)", D.TEAM),
     ("Formation", "SUP'COM — 3<super>e</super> année cycle ingénieur, option Cybersecurity and Defense (CySeD)"),
     ("Module / encadrant", "Sécurité Applicative — Dr. Ing. Mohamed-Becha Kaâniche"),
-    ("Document compagnon", "Recueil des besoins fonctionnels et de sécurité (SRE) — docs/recueil-des-besoins.pdf"),
+    ("Document compagnon", "Recueil des besoins fonctionnels et de sécurité (SRE) — docs/recueil_des_besoins.pdf"),
     ("Version / date", f"v{D.VERSION} — {D.DATE}"),
 ], [[D.VERSION, D.DATE, "O. Yacouba, Y. T. Daouda", "Version initiale remise à la séance 2 (spécification &amp; conception)"]])
 d.h1_break = False
@@ -214,8 +214,8 @@ d.table([["Élément", "Convention"],
         [3.2, 14.2])
 d.H2("Livrables")
 d.table([["Livrable", "Emplacement", "Échéance"],
-         ["Cahier des charges (ce document)", "docs/cahier-des-charges.pdf", "Séance 2"],
-         ["Recueil des besoins fonctionnels et SRE", "docs/recueil-des-besoins.pdf", "Séance 2, mis à jour à chaque séance"],
+         ["Cahier des charges (ce document)", "docs/cahier_des_charges.pdf", "Séance 2"],
+         ["Recueil des besoins fonctionnels et SRE", "docs/recueil_des_besoins.pdf", "Séance 2, mis à jour à chaque séance"],
          ["Référentiel des exigences (CSV)", "docs/exigences.csv", "Séance 2, mis à jour en continu"],
          ["Rapport du prototype du moteur (PSNR, robustesse)", "docs/rapports/prototype-moteur.pdf", "Séance 3"],
          ["Code source + pipeline CI", "backend/, frontend/, .github/", "Incrémental, séances 3 à 7"],

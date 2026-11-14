@@ -24,8 +24,8 @@ par son vrai titulaire**.
 
 ## Documents (séance 2 — spécification & conception)
 
-- 📄 [Cahier des charges](docs/cahier-des-charges.pdf)
-- 📄 [Recueil des besoins fonctionnels et SRE](docs/recueil-des-besoins.pdf) — **SQUARE adapté** + cas d'abus, récits d'abus, arbres d'attaque, STRIDE, priorisation AHP
+- 📄 [Cahier des charges](docs/cahier_des_charges.pdf)
+- 📄 [Recueil des besoins fonctionnels et SRE](docs/recueil_des_besoins.pdf) — **SQUARE adapté** + cas d'abus, récits d'abus, arbres d'attaque, STRIDE, priorisation AHP
 - 📊 [Référentiel des exigences de sécurité (CSV)](docs/exigences.csv)
 
 ## Socle technique
