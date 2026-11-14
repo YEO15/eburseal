@@ -4,7 +4,7 @@
 |---|---|
 | `cahier_des_charges.pdf` | Projet, périmètre (binôme), acteurs, architecture, feuille de route sécurité |
 | `recueil_des_besoins.pdf` | Besoins fonctionnels, justification de l'approche SRE, SQUARE étapes 1 à 9, exigences de sécurité, traçabilité |
-| `exigences.csv` | Référentiel des exigences de sécurité (priorité AHP, statut, version) — séparateur `;` |
+| `exigences.csv` | Référentiel des exigences de sécurité (priorité AHP, statut, version) — séparateur `,` (CSV standard) |
 
 ## Gestion des exigences
 
