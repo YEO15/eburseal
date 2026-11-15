@@ -6,7 +6,7 @@ from reportlab.lib import colors
 import data as D
 
 HERE = pathlib.Path(__file__).parent
-out = sys.argv[1] if len(sys.argv) > 1 else str(HERE.parent / "recueil-des-besoins.pdf")
+out = sys.argv[1] if len(sys.argv) > 1 else str(HERE.parent / "recueil_des_besoins.pdf")
 d = Doc(out, "Recueil des besoins", "Besoins fonctionnels et ingénierie des exigences de sécurité (SRE)", D.VERSION, "rdb")
 PRIO = {r[0]: (s, p) for r, s, p in D.prioritized()}
 NA, NS, NF = len(D.ABUSE), len(D.SEC), len(D.FUNC)

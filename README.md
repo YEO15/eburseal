@@ -8,7 +8,7 @@ Projet de l'atelier *Sécurité Applicative* — SUP'COM, 3ᵉ année cycle ing�
 Binôme : **OUATTARA Yacouba** · **YEO Tanna Daouda** (responsabilités partagées, revue croisée obligatoire).
 Encadrant : Dr. Ing. Mohamed-Becha Kaâniche.
 
-> 🔒 Dépôt **privé**, partagé avec l'encadrant. Tous droits réservés (voir [LICENSE](LICENSE)).
+> 🌐 Dépôt **public** (à la demande de l'encadrant, pour l'évaluation outillée). Tous droits réservés (voir [LICENSE](LICENSE)).
 
 ## Le problème
 
@@ -24,8 +24,8 @@ par son vrai titulaire**.
 
 ## Documents (séance 2 — spécification & conception)
 
-- 📄 [Cahier des charges](docs/cahier-des-charges.pdf)
-- 📄 [Recueil des besoins fonctionnels et SRE](docs/recueil-des-besoins.pdf) — **SQUARE adapté** + cas d'abus, récits d'abus, arbres d'attaque, STRIDE, priorisation AHP
+- 📄 [Cahier des charges](docs/cahier_des_charges.pdf)
+- 📄 [Recueil des besoins fonctionnels et SRE](docs/recueil_des_besoins.pdf) — **SQUARE adapté** + cas d'abus, récits d'abus, arbres d'attaque, STRIDE, priorisation AHP
 - 📊 [Référentiel des exigences de sécurité (CSV)](docs/exigences.csv)
 
 ## Socle technique
