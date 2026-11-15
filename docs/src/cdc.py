@@ -217,7 +217,7 @@ d.table([["Livrable", "Emplacement", "Échéance"],
          ["Cahier des charges (ce document)", "docs/cahier_des_charges.pdf", "Séance 2"],
          ["Recueil des besoins fonctionnels et SRE", "docs/recueil_des_besoins.pdf", "Séance 2, mis à jour à chaque séance"],
          ["Référentiel des exigences (CSV)", "docs/exigences.csv", "Séance 2, mis à jour en continu"],
-         ["Rapport du prototype du moteur (PSNR, robustesse)", "docs/rapports/prototype-moteur.pdf", "Séance 3"],
+         ["Rapport du prototype du moteur (PSNR, robustesse)", "docs/rapport_prototype_moteur.pdf", "Séance 3"],
          ["Code source + pipeline CI", "backend/, frontend/, .github/", "Incrémental, séances 3 à 7"],
          ["Rapports de tests de sécurité", "docs/rapports/", "Séance 6"]],
         [6.4, 6.2, 4.8])

@@ -4,6 +4,7 @@
 |---|---|
 | `cahier_des_charges.pdf` | Projet, périmètre (binôme), acteurs, architecture, feuille de route sécurité |
 | `recueil_des_besoins.pdf` | Besoins fonctionnels, justification de l'approche SRE, SQUARE étapes 1 à 9, exigences de sécurité, traçabilité |
+| `cahier_conceptuel.pdf` | Phase 2 : revue de l'application (DFD), modèle de menaces STRIDE, évaluation OWASP Risk Rating, contre-mesures, architecture et patrons de sécurité |
 | `exigences.csv` | Référentiel des exigences de sécurité (priorité AHP, statut, version) — séparateur `,` (CSV standard) |
 
 ## Gestion des exigences
@@ -15,5 +16,5 @@ pip install reportlab numpy      # + Graphviz (commande `dot`)
 cd docs/src && ./build.sh
 ```
 
-Le script régénère les diagrammes, les deux PDF et `exigences.csv`. Pensez à incrémenter `VERSION`
+Le script régénère les diagrammes, les trois PDF et `exigences.csv`. Le modèle de menaces de la phase 2 est dans `src/cco_data.py`. Pensez à incrémenter `VERSION`
 et à ajouter une ligne d'historique dans `cdc.py` / `rdb.py` (section 11 du recueil).
