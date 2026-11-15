@@ -28,6 +28,10 @@ par son vrai titulaire**.
 - 📄 [Recueil des besoins fonctionnels et SRE](docs/recueil_des_besoins.pdf) — **SQUARE adapté** + cas d'abus, récits d'abus, arbres d'attaque, STRIDE, priorisation AHP
 - 📊 [Référentiel des exigences de sécurité (CSV)](docs/exigences.csv)
 
+## Documents (phase 2 — conception sécurisée)
+
+- 📄 [Cahier conceptuel](docs/cahier_conceptuel.pdf) — DFD et frontières de confiance, **STRIDE par élément** (31 menaces contextualisées, CAPEC/CWE), critique de DREAD, notation **OWASP Risk Rating**, contre-mesures natives / applicatives, patrons de conception, complément LINDDUN
+
 ## Socle technique
 
 | Couche | Technologie |
