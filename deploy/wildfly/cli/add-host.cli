@@ -1,23 +1,82 @@
-batch
+# add-host.cli — hôte virtuel supplémentaire servant une SPA (ex. admin.)
+# Version EburSeal du script de l'encadrant (voir les commentaires « EBURSEAL »).
+# Prérequis : default-host.cli a été exécuté (il crée les filtres partagés).
+# Usage : jboss-cli --connect --file=add-host.cli --properties=<env>/admin-host.properties
+# EBURSEAL (relançable) : plus de « batch » global ; chaque création est précédée
+# d'un test d'existence, comme dans add-api.cli.
+
 set pathTo=`:resolve-expression(expression=${host.path})`
 set aliasTo=`:resolve-expression(expression=${host.aliases})`
 set contentTo=`:resolve-expression(expression=${host.key}-content)`
 set spaPath=`:resolve-expression(expression=${host.path}/index.html)`
-set corsRegex=`:resolve-expression(expression="regex(pattern='^(https:\\/\\/(?:.+\\.)?${host.domains}(?::\\d{1,5})?(\\/([a-zA-Z0-9\\-_?&=%.;:+]{2,})?)*)$',value=%{i,Origin},full-match=true)"`
+# EBURSEAL (CORS) : même règle corrigée que dans default-host.cli (l'originale acceptait
+# https://evileburseal.tld et refusait les ports ; il lui manquait aussi une parenthèse fermante)
+set corsRegex=`:resolve-expression(expression="regex(pattern='^https://([a-zA-Z0-9-]+[.])*${host.domains}(:[0-9]{1,5})?$',value=%{i,Origin},full-match=true)")`
 set escaped=\"$corsRegex\"
-/subsystem=undertow/configuration=handler/file=${host.key}-content:add(path=$pathTo)
-/subsystem=undertow/server=default-server/host=${host.key}-host:add(alias=[$aliasTo])
-/subsystem=undertow/server=default-server/host=${host.key}-host/location=\/:add(handler=$contentTo)
-/subsystem=undertow/server=default-server/host=${host.key}-host/filter-ref=hsts-header:add(predicate="equals(%p,443)")
-/subsystem=undertow/server=default-server/host=${host.key}-host/filter-ref=http-to-https:add(predicate="equals(%p,80)")
-/subsystem=undertow/configuration=filter/error-page=spa-${host.key}-router:add(code="404",path=$spaPath)
-/subsystem=undertow/server=default-server/host=${host.key}-host/filter-ref=spa-${host.key}-router:add(predicate="true")
-/subsystem=undertow/server=default-server/host=${host.key}-host/filter-ref=cache-control:add(predicate="true")
-/subsystem=undertow/server=default-server/host=${host.key}-host/filter-ref=content-type-options:add(predicate="true")
-/subsystem=undertow/server=default-server/host=${host.key}-host/filter-ref="Access-Control-Allow-Origin":add(predicate=$escaped)
-/subsystem=undertow/server=default-server/host=${host.key}-host/filter-ref="Access-Control-Allow-Methods":add(predicate=$escaped)
-/subsystem=undertow/server=default-server/host=${host.key}-host/filter-ref="Access-Control-Allow-Headers":add(predicate=$escaped)
-/subsystem=undertow/server=default-server/host=${host.key}-host/filter-ref="Access-Control-Expose-Headers":add(predicate=$escaped)
-/subsystem=undertow/server=default-server/host=${host.key}-host/filter-ref="Access-Control-Allow-Credentials":add(predicate=$escaped)
-/subsystem=undertow/server=default-server/host=${host.key}-host/filter-ref="Access-Control-Max-Age":add(predicate=$escaped)
-run-batch
+
+# 1. Contenu servi, hôte et routeur SPA (propres à cet hôte)
+if (outcome != success) of /subsystem=undertow/configuration=handler/file=${host.key}-content:read-resource
+    /subsystem=undertow/configuration=handler/file=${host.key}-content:add(path=$pathTo)
+end-if
+if (outcome != success) of /subsystem=undertow/server=default-server/host=${host.key}-host:read-resource
+    /subsystem=undertow/server=default-server/host=${host.key}-host:add(alias=[$aliasTo])
+end-if
+if (outcome != success) of /subsystem=undertow/server=default-server/host=${host.key}-host/location=\/:read-resource
+    /subsystem=undertow/server=default-server/host=${host.key}-host/location=\/:add(handler=$contentTo)
+end-if
+if (outcome != success) of /subsystem=undertow/configuration=filter/error-page=spa-${host.key}-router:read-resource
+    /subsystem=undertow/configuration=filter/error-page=spa-${host.key}-router:add(code="404",path=$spaPath)
+end-if
+
+# 2. Rattachement des filtres à l'hôte
+# EBURSEAL (ports) : « secure » / « not secure » au lieu de equals(%p,443) / equals(%p,80)
+if (outcome != success) of /subsystem=undertow/server=default-server/host=${host.key}-host/filter-ref=hsts-header:read-resource
+    /subsystem=undertow/server=default-server/host=${host.key}-host/filter-ref=hsts-header:add(predicate="secure")
+end-if
+if (outcome != success) of /subsystem=undertow/server=default-server/host=${host.key}-host/filter-ref=http-to-https:read-resource
+    /subsystem=undertow/server=default-server/host=${host.key}-host/filter-ref=http-to-https:add(predicate="not secure")
+end-if
+if (outcome != success) of /subsystem=undertow/server=default-server/host=${host.key}-host/filter-ref=spa-${host.key}-router:read-resource
+    /subsystem=undertow/server=default-server/host=${host.key}-host/filter-ref=spa-${host.key}-router:add(predicate="true")
+end-if
+if (outcome != success) of /subsystem=undertow/server=default-server/host=${host.key}-host/filter-ref=cache-control:read-resource
+    /subsystem=undertow/server=default-server/host=${host.key}-host/filter-ref=cache-control:add(predicate="true")
+end-if
+if (outcome != success) of /subsystem=undertow/server=default-server/host=${host.key}-host/filter-ref=content-type-options:read-resource
+    /subsystem=undertow/server=default-server/host=${host.key}-host/filter-ref=content-type-options:add(predicate="true")
+end-if
+# EBURSEAL (SR-DEP-03) : en-têtes absents de la version d'origine
+if (outcome != success) of /subsystem=undertow/server=default-server/host=${host.key}-host/filter-ref=content-security-policy:read-resource
+    /subsystem=undertow/server=default-server/host=${host.key}-host/filter-ref=content-security-policy:add(predicate="true")
+end-if
+if (outcome != success) of /subsystem=undertow/server=default-server/host=${host.key}-host/filter-ref=referrer-policy:read-resource
+    /subsystem=undertow/server=default-server/host=${host.key}-host/filter-ref=referrer-policy:add(predicate="true")
+end-if
+if (outcome != success) of /subsystem=undertow/server=default-server/host=${host.key}-host/filter-ref=permissions-policy:read-resource
+    /subsystem=undertow/server=default-server/host=${host.key}-host/filter-ref=permissions-policy:add(predicate="true")
+end-if
+# CORS : seules les origines de notre domaine reçoivent les en-têtes (Allow-Origin = origine exacte)
+if (outcome != success) of /subsystem=undertow/server=default-server/host=${host.key}-host/filter-ref="Access-Control-Allow-Origin":read-resource
+    /subsystem=undertow/server=default-server/host=${host.key}-host/filter-ref="Access-Control-Allow-Origin":add(predicate=$escaped)
+end-if
+if (outcome != success) of /subsystem=undertow/server=default-server/host=${host.key}-host/filter-ref=cors-vary:read-resource
+    /subsystem=undertow/server=default-server/host=${host.key}-host/filter-ref=cors-vary:add(predicate="true")
+end-if
+if (outcome != success) of /subsystem=undertow/server=default-server/host=${host.key}-host/filter-ref="Access-Control-Allow-Methods":read-resource
+    /subsystem=undertow/server=default-server/host=${host.key}-host/filter-ref="Access-Control-Allow-Methods":add(predicate=$escaped)
+end-if
+if (outcome != success) of /subsystem=undertow/server=default-server/host=${host.key}-host/filter-ref="Access-Control-Allow-Headers":read-resource
+    /subsystem=undertow/server=default-server/host=${host.key}-host/filter-ref="Access-Control-Allow-Headers":add(predicate=$escaped)
+end-if
+if (outcome != success) of /subsystem=undertow/server=default-server/host=${host.key}-host/filter-ref="Access-Control-Expose-Headers":read-resource
+    /subsystem=undertow/server=default-server/host=${host.key}-host/filter-ref="Access-Control-Expose-Headers":add(predicate=$escaped)
+end-if
+if (outcome != success) of /subsystem=undertow/server=default-server/host=${host.key}-host/filter-ref="Access-Control-Allow-Credentials":read-resource
+    /subsystem=undertow/server=default-server/host=${host.key}-host/filter-ref="Access-Control-Allow-Credentials":add(predicate=$escaped)
+end-if
+if (outcome != success) of /subsystem=undertow/server=default-server/host=${host.key}-host/filter-ref="Access-Control-Max-Age":read-resource
+    /subsystem=undertow/server=default-server/host=${host.key}-host/filter-ref="Access-Control-Max-Age":add(predicate=$escaped)
+end-if
+
+# EBURSEAL : la création d'un hôte n'est prise en compte qu'après rechargement
+reload
