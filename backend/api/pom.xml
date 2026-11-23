@@ -15,6 +15,11 @@
     <name>EburSeal — api</name>
     <description>WAR Jakarta REST déployé sur WildFly 42 (hôte api.).</description>
 
+    <properties>
+        <!-- Même clé que api.properties (add-api.cli) : le WAR s'appelle ${api.name}-${api.version}.war -->
+        <api.version>1.0</api.version>
+    </properties>
+
     <dependencies>
         <!-- API Jakarta EE 11 fournie par WildFly 42 (non embarquée dans le WAR) -->
         <dependency>
@@ -37,6 +42,6 @@
 
     <build>
         <!-- Nom attendu par add-api.cli : ${api.name}-${api.version}.war -->
-        <finalName>api-1.0</finalName>
+        <finalName>api-${api.version}</finalName>
     </build>
 </project>
