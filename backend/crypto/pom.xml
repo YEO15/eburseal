@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>tn.supcom.eburseal</groupId>
+        <artifactId>eburseal-parent</artifactId>
+        <version>0.3.0-SNAPSHOT</version>
+    </parent>
+
+    <artifactId>crypto</artifactId>
+    <packaging>jar</packaging>
+    <name>EburSeal — crypto</name>
+    <description>Ed25519 + JCS (RFC 8785), AES-256-GCM, Argon2id, SHA3.</description>
+
+    <dependencies>
+        <dependency><groupId>tn.supcom.eburseal</groupId><artifactId>commun</artifactId></dependency>
+    </dependencies>
+</project>
