@@ -1,8 +1,18 @@
+# add-api.cli — hôte virtuel d'une API (ex. api.) : sert le WAR ${api.name}-${api.version}.war
+# Version EburSeal du script de l'encadrant (voir les commentaires « EBURSEAL »).
+# Prérequis : default-host.cli a été exécuté (il crée les filtres partagés).
+# Usage : jboss-cli --connect --file=add-api.cli --properties=<env>/api.properties
+
 set pathTo=`:resolve-expression(expression=${api.name}-${api.version}.war)`
 set aliasTo=`:resolve-expression(expression=${api.aliases})`
 set logPrefix=`:resolve-expression(expression=${api.context}-${api.name})`
-set corsRegex=`:resolve-expression(expression="regex(pattern='^(https:\\/\\/(?:.+\\.)?${api.domains}(?::\\d{1,5})?(\\/([a-zA-Z0-9\\-_?&=%.;:+]{2,})?)*)$',value=%{i,Origin},full-match=true)")`
+# EBURSEAL (CORS) : l'expression d'origine perdait ses « \\ » à l'exécution : « . » devenait « n'importe quel
+# caractère » (https://evileburseal.tld était accepté) et le port n'était jamais reconnu. Nouvelle règle, sans
+# antislash : https:// + sous-domaines éventuels + notre domaine + port facultatif, et rien d'autre.
+set corsRegex=`:resolve-expression(expression="regex(pattern='^https://([a-zA-Z0-9-]+[.])*${api.domains}(:[0-9]{1,5})?$',value=%{i,Origin},full-match=true)")`
 set escaped=\"$corsRegex\"
+
+# 1. Hôte et journal d'accès (bloc d'origine, déjà relançable)
 if (outcome != success) of /subsystem=undertow/server=default-server/host=${api.name}-host:read-resource
     echo ">>> Initializing module infrastructure for: ${api.name}"
     batch
@@ -10,15 +20,70 @@ if (outcome != success) of /subsystem=undertow/server=default-server/host=${api.
     /subsystem=undertow/server=default-server/host=${api.name}-host/setting=access-log:add
     /subsystem=undertow/server=default-server/host=${api.name}-host/setting=access-log:write-attribute(name=pattern,value="combined")
     /subsystem=undertow/server=default-server/host=${api.name}-host/setting=access-log:write-attribute(name=prefix,value=$logPrefix)
-    /subsystem=undertow/server=default-server/host=${api.name}-host/filter-ref=hsts-header:add(predicate="equals(%p,443)")
-    /subsystem=undertow/server=default-server/host=${api.name}-host/filter-ref=http-to-https:add(predicate="equals(%p,80)")
-    /subsystem=undertow/server=default-server/host=${api.name}-host/filter-ref="Access-Control-Allow-Origin":add(predicate=$escaped)
-    /subsystem=undertow/server=default-server/host=${api.name}-host/filter-ref="Access-Control-Allow-Methods":add(predicate=$escaped)
-    /subsystem=undertow/server=default-server/host=${api.name}-host/filter-ref="Access-Control-Allow-Headers":add(predicate=$escaped)
-    /subsystem=undertow/server=default-server/host=${api.name}-host/filter-ref="Access-Control-Expose-Headers":add(predicate=$escaped)
-    /subsystem=undertow/server=default-server/host=${api.name}-host/filter-ref="Access-Control-Allow-Credentials":add(predicate=$escaped)
-    /subsystem=undertow/server=default-server/host=${api.name}-host/filter-ref="Access-Control-Max-Age":add(predicate=$escaped)
     run-batch
 else
     echo ">>> Module infrastructure for ${api.name}-host already exists. Skipping."
 end-if
+
+# EBURSEAL (relançable) : les filtres sont rattachés un par un, chacun après un test
+# d'existence. Un filtre ajouté plus tard au script est donc appliqué même si l'hôte existe déjà.
+
+# 2. Filtres propres aux API (EBURSEAL, SR-CON-05 et SR-DEP-03)
+# Une réponse d'API peut contenir des données personnelles : jamais mise en cache
+if (outcome != success) of /subsystem=undertow/configuration=filter/response-header=api-cache-control:read-resource
+    /subsystem=undertow/configuration=filter/response-header=api-cache-control:add(header-name=Cache-Control,header-value="no-store")
+end-if
+# Une API ne renvoie que du JSON : aucune ressource ne doit être chargée ni la réponse encadrée
+if (outcome != success) of /subsystem=undertow/configuration=filter/response-header=api-csp:read-resource
+    /subsystem=undertow/configuration=filter/response-header=api-csp:add(header-name=Content-Security-Policy,header-value="default-src 'none'; frame-ancestors 'none'")
+end-if
+
+# 3. Rattachement des filtres à l'hôte de l'API
+# EBURSEAL (ports) : « secure » / « not secure » au lieu de equals(%p,443) / equals(%p,80)
+if (outcome != success) of /subsystem=undertow/server=default-server/host=${api.name}-host/filter-ref=hsts-header:read-resource
+    /subsystem=undertow/server=default-server/host=${api.name}-host/filter-ref=hsts-header:add(predicate="secure")
+end-if
+if (outcome != success) of /subsystem=undertow/server=default-server/host=${api.name}-host/filter-ref=http-to-https:read-resource
+    /subsystem=undertow/server=default-server/host=${api.name}-host/filter-ref=http-to-https:add(predicate="not secure")
+end-if
+# EBURSEAL (SR-DEP-03) : en-têtes absents de la version d'origine sur l'hôte de l'API
+if (outcome != success) of /subsystem=undertow/server=default-server/host=${api.name}-host/filter-ref=content-type-options:read-resource
+    /subsystem=undertow/server=default-server/host=${api.name}-host/filter-ref=content-type-options:add(predicate="true")
+end-if
+if (outcome != success) of /subsystem=undertow/server=default-server/host=${api.name}-host/filter-ref=referrer-policy:read-resource
+    /subsystem=undertow/server=default-server/host=${api.name}-host/filter-ref=referrer-policy:add(predicate="true")
+end-if
+if (outcome != success) of /subsystem=undertow/server=default-server/host=${api.name}-host/filter-ref=permissions-policy:read-resource
+    /subsystem=undertow/server=default-server/host=${api.name}-host/filter-ref=permissions-policy:add(predicate="true")
+end-if
+if (outcome != success) of /subsystem=undertow/server=default-server/host=${api.name}-host/filter-ref=api-cache-control:read-resource
+    /subsystem=undertow/server=default-server/host=${api.name}-host/filter-ref=api-cache-control:add(predicate="true")
+end-if
+if (outcome != success) of /subsystem=undertow/server=default-server/host=${api.name}-host/filter-ref=api-csp:read-resource
+    /subsystem=undertow/server=default-server/host=${api.name}-host/filter-ref=api-csp:add(predicate="true")
+end-if
+# CORS : seules les origines de notre domaine reçoivent les en-têtes (Allow-Origin = origine exacte, voir default-host.cli)
+if (outcome != success) of /subsystem=undertow/server=default-server/host=${api.name}-host/filter-ref="Access-Control-Allow-Origin":read-resource
+    /subsystem=undertow/server=default-server/host=${api.name}-host/filter-ref="Access-Control-Allow-Origin":add(predicate=$escaped)
+end-if
+if (outcome != success) of /subsystem=undertow/server=default-server/host=${api.name}-host/filter-ref=cors-vary:read-resource
+    /subsystem=undertow/server=default-server/host=${api.name}-host/filter-ref=cors-vary:add(predicate="true")
+end-if
+if (outcome != success) of /subsystem=undertow/server=default-server/host=${api.name}-host/filter-ref="Access-Control-Allow-Methods":read-resource
+    /subsystem=undertow/server=default-server/host=${api.name}-host/filter-ref="Access-Control-Allow-Methods":add(predicate=$escaped)
+end-if
+if (outcome != success) of /subsystem=undertow/server=default-server/host=${api.name}-host/filter-ref="Access-Control-Allow-Headers":read-resource
+    /subsystem=undertow/server=default-server/host=${api.name}-host/filter-ref="Access-Control-Allow-Headers":add(predicate=$escaped)
+end-if
+if (outcome != success) of /subsystem=undertow/server=default-server/host=${api.name}-host/filter-ref="Access-Control-Expose-Headers":read-resource
+    /subsystem=undertow/server=default-server/host=${api.name}-host/filter-ref="Access-Control-Expose-Headers":add(predicate=$escaped)
+end-if
+if (outcome != success) of /subsystem=undertow/server=default-server/host=${api.name}-host/filter-ref="Access-Control-Allow-Credentials":read-resource
+    /subsystem=undertow/server=default-server/host=${api.name}-host/filter-ref="Access-Control-Allow-Credentials":add(predicate=$escaped)
+end-if
+if (outcome != success) of /subsystem=undertow/server=default-server/host=${api.name}-host/filter-ref="Access-Control-Max-Age":read-resource
+    /subsystem=undertow/server=default-server/host=${api.name}-host/filter-ref="Access-Control-Max-Age":add(predicate=$escaped)
+end-if
+
+# EBURSEAL : la création d'un hôte n'est prise en compte qu'après rechargement
+reload

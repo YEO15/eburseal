@@ -13,7 +13,10 @@ set spaPath=`:resolve-expression(expression=${default.path}/index.html)`
 set httpsTarget=`:resolve-expression(expression=https://%v:${default.https.port}%U)`
 # EBURSEAL (SR-DEP-03) : politique de sécurité du contenu ; seule l'API de notre domaine est joignable
 set csp=`:resolve-expression(expression="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; font-src 'self'; connect-src 'self' https://*.${default.domains}; manifest-src 'self'; worker-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'")`
-set corsRegex=`:resolve-expression(expression="regex(pattern='^(https:\\/\\/(?:.+\\.)?${default.domains}(?::\\d{1,5})?(\\/([a-zA-Z0-9\\-_?&=%.;:+]{2,})?)*)$',value=%{i,Origin},full-match=true)")`
+# EBURSEAL (CORS) : l'expression d'origine perdait ses « \\ » à l'exécution : « . » devenait « n'importe quel
+# caractère » (https://evileburseal.tld était accepté) et le port n'était jamais reconnu. Nouvelle règle, sans
+# antislash : https:// + sous-domaines éventuels + notre domaine + port facultatif, et rien d'autre.
+set corsRegex=`:resolve-expression(expression="regex(pattern='^https://([a-zA-Z0-9-]+[.])*${default.domains}(:[0-9]{1,5})?$',value=%{i,Origin},full-match=true)")`
 set escaped=\"$corsRegex\"
 
 # 1. Contenu servi et alias (write-attribute : relançable tel quel)
