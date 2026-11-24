@@ -25,6 +25,8 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <jakartaee.version>11.0.0</jakartaee.version>
         <junit.version>5.12.2</junit.version>
+        <!-- SR-TST-02 : version figée (un appel sans version prendrait la dernière publiée) -->
+        <dependency-check.version>13.0.0</dependency-check.version>
     </properties>
 
     <!-- Versions déclarées une seule fois ; chaque module choisit ce qu'il utilise -->
@@ -86,6 +88,11 @@
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-war-plugin</artifactId>
                     <version>3.4.0</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.owasp</groupId>
+                    <artifactId>dependency-check-maven</artifactId>
+                    <version>${dependency-check.version}</version>
                 </plugin>
             </plugins>
         </pluginManagement>
