@@ -1,0 +1,34 @@
+# tls.cli — HTTPS de WildFly : certificat de l'environnement et TLS 1.3 uniquement (SR-CON-01)
+# Script EburSeal (absent des scripts de l'encadrant). Relançable.
+# Usage : jboss-cli --connect --file=tls.cli --properties=<env>/tls.properties
+#   tls.keystore.path     : chemin absolu du fichier PKCS#12 (certificat + clé privée)
+#   tls.keystore.password : mot de passe du fichier (dev : « changeit », valeur par défaut de mkcert)
+# En dev  : certificat mkcert pour *.eburseal.local (navigateur sans alerte).
+# En prod : certificat wildcard Let's Encrypt *.<domaine> ; un seul certificat sert tous les
+#           hôtes virtuels (www., api., admin., iam.) grâce au SNI (séance 3, diapo 139).
+
+set ksPath=`:resolve-expression(expression=${tls.keystore.path})`
+set ksPass=`:resolve-expression(expression=${tls.keystore.password})`
+
+# 1. Magasin contenant le certificat et sa clé privée
+if (outcome != success) of /subsystem=elytron/key-store=eburseal-ks:read-resource
+    /subsystem=elytron/key-store=eburseal-ks:add(path=$ksPath,type=PKCS12,credential-reference={clear-text=$ksPass})
+end-if
+# Relance avec un autre chemin (certificat renouvelé) : on met le chemin à jour
+/subsystem=elytron/key-store=eburseal-ks:write-attribute(name=path,value=$ksPath)
+
+# 2. Gestionnaire de clés qui présente ce certificat aux navigateurs
+if (outcome != success) of /subsystem=elytron/key-manager=eburseal-km:read-resource
+    /subsystem=elytron/key-manager=eburseal-km:add(key-store=eburseal-ks,credential-reference={clear-text=$ksPass})
+end-if
+
+# 3. Contexte TLS : TLS 1.3 uniquement. Avec Elytron, les suites TLS 1.3 doivent être
+#    listées dans cipher-suite-names, sinon aucune n'est active et la connexion échoue.
+if (outcome != success) of /subsystem=elytron/server-ssl-context=eburseal-ssc:read-resource
+    /subsystem=elytron/server-ssl-context=eburseal-ssc:add(key-manager=eburseal-km,protocols=["TLSv1.3"],cipher-suite-names="TLS_AES_256_GCM_SHA384:TLS_CHACHA20_POLY1305_SHA256:TLS_AES_128_GCM_SHA256")
+end-if
+
+# 4. Le port HTTPS utilise ce contexte (au lieu du certificat auto-signé « applicationSSC »)
+/subsystem=undertow/server=default-server/https-listener=https:write-attribute(name=ssl-context,value=eburseal-ssc)
+
+reload
