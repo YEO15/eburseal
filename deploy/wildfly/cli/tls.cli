@@ -1,5 +1,5 @@
 # tls.cli — HTTPS de WildFly : certificat de l'environnement et TLS 1.3 uniquement (SR-CON-01)
-# Script EburSeal (absent des scripts de l'encadrant). Relançable.
+# Script EburSeal. Relançable.
 # Usage : jboss-cli --connect --file=tls.cli --properties=<env>/tls.properties
 #   tls.keystore.path     : chemin absolu du fichier PKCS#12 (certificat + clé privée)
 #   tls.keystore.password : mot de passe du fichier (dev : « changeit », valeur par défaut de mkcert)
@@ -14,7 +14,7 @@ set ksPass=`:resolve-expression(expression=${tls.keystore.password})`
 if (outcome != success) of /subsystem=elytron/key-store=eburseal-ks:read-resource
     /subsystem=elytron/key-store=eburseal-ks:add(path=$ksPath,type=PKCS12,credential-reference={clear-text=$ksPass})
 end-if
-# Relance avec un autre chemin (certificat renouvelé) : on met le chemin à jour
+# Relance avec un autre chemin (certificat renouvelé)
 /subsystem=elytron/key-store=eburseal-ks:write-attribute(name=path,value=$ksPath)
 
 # 2. Gestionnaire de clés qui présente ce certificat aux navigateurs
