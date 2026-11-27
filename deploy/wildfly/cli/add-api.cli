@@ -3,6 +3,11 @@
 # Prérequis : default-host.cli a été exécuté (il crée les filtres partagés).
 # Usage : jboss-cli --connect --file=add-api.cli --properties=<env>/api.properties
 
+# Fonctionnement des lignes « set » : chaque valeur du fichier .properties (${...}) est
+# résolue par :resolve-expression puis rangée dans une variable du script ($nom), réutilisée
+# plus bas dans les commandes. Un bloc « if (outcome != success) of …:read-resource »
+# n'exécute son contenu que si la ressource n'existe pas encore (création unique).
+
 set pathTo=`:resolve-expression(expression=${api.name}-${api.version}.war)`
 set aliasTo=`:resolve-expression(expression=${api.aliases})`
 set logPrefix=`:resolve-expression(expression=${api.context}-${api.name})`
@@ -13,6 +18,10 @@ set corsRegex=`:resolve-expression(expression="regex(pattern='^https://([a-zA-Z0
 set escaped=\"$corsRegex\"
 
 # 1. Hôte et journal d'accès (bloc d'origine, déjà relançable)
+# default-web-module : le WAR servi à la racine de l'hôte (api-1.0.war).
+# access-log : journal de chaque requête reçue (format « combined » : IP, date, requête, code, navigateur),
+# dans standalone/log, fichier préfixé par api.context-api.name. Le « batch » applique les 4 commandes
+# en bloc : soit toutes réussissent, soit aucune n'est appliquée.
 if (outcome != success) of /subsystem=undertow/server=default-server/host=${api.name}-host:read-resource
     echo ">>> Initializing module infrastructure for: ${api.name}"
     batch
@@ -39,6 +48,8 @@ if (outcome != success) of /subsystem=undertow/configuration=filter/response-hea
 end-if
 
 # 3. Rattachement des filtres à l'hôte de l'API
+# Les filtres sont définis dans default-host.cli (sauf les deux propres à l'API, étape 2) ;
+# ici on les active pour l'hôte api-host.
 # EBURSEAL (ports) : « secure » / « not secure » au lieu de equals(%p,443) / equals(%p,80)
 if (outcome != success) of /subsystem=undertow/server=default-server/host=${api.name}-host/filter-ref=hsts-header:read-resource
     /subsystem=undertow/server=default-server/host=${api.name}-host/filter-ref=hsts-header:add(predicate="secure")
