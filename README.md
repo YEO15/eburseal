@@ -45,7 +45,7 @@ par son vrai titulaire**.
 ## Structure du dépôt
 
 ```
-backend/     WAR Jakarta EE 11 (Maven) — API REST sous /api
+backend/     Projet Maven multi-modules : commun, crypto, moteur, banc, api (WAR Jakarta EE 11, API REST sous /api)
 frontend/    SPA PWA
 docs/        PDF remis + sources (docs/src) pour régénérer les documents
 .github/     CI, modèles d'issues (feature, abuse-story, security-story), modèle de PR
@@ -54,11 +54,11 @@ docs/        PDF remis + sources (docs/src) pour régénérer les documents
 ## Démarrer
 
 ```bash
-# Back-end (JDK 25 + Maven) → backend/target/eburseal.war
+# Back-end (JDK 25 + Maven) → backend/api/target/api-1.0.war
 mvn -f backend/pom.xml verify
-cp backend/target/eburseal.war $WILDFLY_HOME/standalone/deployments/
+cp backend/api/target/api-1.0.war $WILDFLY_HOME/standalone/deployments/
 $WILDFLY_HOME/bin/standalone.sh
-curl -k https://localhost:8443/eburseal/api/info      # {"application":"EburSeal","status":"up"}
+curl -k https://localhost:8443/api-1.0/api/info       # {"application":"EburSeal","status":"up"}
 
 # Front-end (Node 22)
 cd frontend && npm ci && npm run dev

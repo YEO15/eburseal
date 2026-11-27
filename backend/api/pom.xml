@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>tn.supcom.eburseal</groupId>
+        <artifactId>eburseal-parent</artifactId>
+        <version>0.3.0-SNAPSHOT</version>
+    </parent>
+
+    <artifactId>api</artifactId>
+    <packaging>war</packaging>
+    <name>EburSeal — api</name>
+    <description>WAR Jakarta REST déployé sur WildFly 42 (hôte api.).</description>
+
+    <properties>
+        <!-- Même clé que api.properties (add-api.cli) : le WAR s'appelle ${api.name}-${api.version}.war -->
+        <api.version>1.0</api.version>
+    </properties>
+
+    <dependencies>
+        <!-- API Jakarta EE 11 fournie par WildFly 42 (non embarquée dans le WAR) -->
+        <dependency>
+            <groupId>jakarta.platform</groupId>
+            <artifactId>jakarta.jakartaee-api</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>tn.supcom.eburseal</groupId>
+            <artifactId>commun</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>tn.supcom.eburseal</groupId>
+            <artifactId>crypto</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>tn.supcom.eburseal</groupId>
+            <artifactId>moteur</artifactId>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <!-- Nom attendu par add-api.cli : ${api.name}-${api.version}.war -->
+        <finalName>api-${api.version}</finalName>
+    </build>
+</project>

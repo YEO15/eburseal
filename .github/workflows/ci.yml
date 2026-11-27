@@ -40,7 +40,7 @@ jobs:
         # la couverture est alors assurée par le job « Dependency Review » (GitHub Advisory Database).
         run: |
           set +e +o pipefail
-          mvn -B -f backend/pom.xml org.owasp:dependency-check-maven:check \
+          mvn -B -f backend/pom.xml org.owasp:dependency-check-maven:aggregate \
             -DfailBuildOnCVSS=7 -DnvdApiKey="${NVD_API_KEY}" 2>&1 | tee dependency-check.log
           status=${PIPESTATUS[0]}
           if grep -qi "identified with vulnerabilities" dependency-check.log; then
