@@ -6,6 +6,11 @@
 # d'un test d'existence, comme dans add-api.cli. Le script peut donc être relancé
 # à chaque déploiement sans erreur « Duplicate resource ».
 
+# Fonctionnement des lignes « set » : chaque valeur du fichier .properties (${...}) est
+# résolue par :resolve-expression puis rangée dans une variable du script ($nom), réutilisée
+# plus bas dans les commandes. Un bloc « if (outcome != success) of …:read-resource »
+# n'exécute son contenu que si la ressource n'existe pas encore (création unique).
+
 set pathTo=`:resolve-expression(expression=${default.path})`
 set aliasTo=`:resolve-expression(expression=${default.aliases})`
 set spaPath=`:resolve-expression(expression=${default.path}/index.html)`
@@ -17,25 +22,36 @@ set csp=`:resolve-expression(expression="default-src 'self'; script-src 'self'; 
 # caractère » (https://evileburseal.tld était accepté) et le port n'était jamais reconnu. Nouvelle règle, sans
 # antislash : https:// + sous-domaines éventuels + notre domaine + port facultatif, et rien d'autre.
 set corsRegex=`:resolve-expression(expression="regex(pattern='^https://([a-zA-Z0-9-]+[.])*${default.domains}(:[0-9]{1,5})?$',value=%{i,Origin},full-match=true)")`
+# Le prédicat CORS est entouré de guillemets pour être passé tel quel aux filtres ci-dessous
 set escaped=\"$corsRegex\"
 
 # 1. Contenu servi et alias (write-attribute : relançable tel quel)
+# welcome-content : dossier servi par l'hôte par défaut → la PWA compilée.
+# alias : nom de domaine auquel l'hôte répond (www.eburseal.local en dev).
 /subsystem=undertow/configuration=handler/file=welcome-content:write-attribute(name=path,value=$pathTo)
 /subsystem=undertow/server=default-server/host=default-host:write-attribute(name=alias,value=[$aliasTo])
 
 # 2. Définition des filtres, partagés avec add-host.cli et add-api.cli
+# Un filtre est une règle appliquée aux réponses (ajout d'en-tête, redirection…).
+# Il est d'abord défini une fois ici, puis rattaché à chaque hôte à l'étape 3.
+# HSTS : le navigateur s'engage à n'utiliser que HTTPS pendant 2 ans, sous-domaines compris.
 if (outcome != success) of /subsystem=undertow/configuration=filter/response-header=hsts-header:read-resource
     /subsystem=undertow/configuration=filter/response-header=hsts-header:add(header-name=Strict-Transport-Security,header-value="max-age=63072000; includeSubDomains; preload")
 end-if
+# Redirection : toute requête HTTP est renvoyée vers la même adresse en HTTPS
+# (%v = nom d'hôte demandé, %U = chemin demandé).
 if (outcome != success) of /subsystem=undertow/configuration=filter/rewrite=http-to-https:read-resource
     /subsystem=undertow/configuration=filter/rewrite=http-to-https:add(target=$httpsTarget,redirect=true)
 end-if
+# Routeur SPA : une adresse inconnue (404) renvoie index.html, la PWA gère ensuite ses propres pages.
 if (outcome != success) of /subsystem=undertow/configuration=filter/error-page=spa-default-router:read-resource
     /subsystem=undertow/configuration=filter/error-page=spa-default-router:add(code="404",path=$spaPath)
 end-if
+# Cache-Control : pas de stockage dans un cache partagé, revalidation à chaque visite.
 if (outcome != success) of /subsystem=undertow/configuration=filter/response-header=cache-control:read-resource
     /subsystem=undertow/configuration=filter/response-header=cache-control:add(header-name=Cache-Control,header-value="private,no-cache")
 end-if
+# nosniff : le navigateur respecte le type annoncé et ne « devine » pas le type d'un fichier.
 if (outcome != success) of /subsystem=undertow/configuration=filter/response-header=content-type-options:read-resource
     /subsystem=undertow/configuration=filter/response-header=content-type-options:add(header-name=X-Content-Type-Options,header-value="nosniff")
 end-if
@@ -57,6 +73,8 @@ end-if
 if (outcome != success) of /subsystem=undertow/configuration=filter/response-header=cors-vary:read-resource
     /subsystem=undertow/configuration=filter/response-header=cors-vary:add(header-name=Vary,header-value="Origin")
 end-if
+# En-têtes CORS : méthodes et en-têtes autorisés, en-têtes lisibles par la page,
+# envoi des cookies autorisé, durée de mise en cache de la réponse CORS (1 s).
 if (outcome != success) of /subsystem=undertow/configuration=filter/response-header="Access-Control-Allow-Methods":read-resource
     /subsystem=undertow/configuration=filter/response-header="Access-Control-Allow-Methods":add(header-name="Access-Control-Allow-Methods",header-value="GET, POST, OPTIONS, HEAD, PUT, PATCH, DELETE")
 end-if
@@ -74,6 +92,8 @@ if (outcome != success) of /subsystem=undertow/configuration=filter/response-hea
 end-if
 
 # 3. Application des filtres à l'hôte par défaut
+# filter-ref rattache un filtre à un hôte ; le prédicat indique quand il s'applique
+# ("true" = toujours, $escaped = seulement si l'origine appartient à notre domaine).
 # EBURSEAL (ports) : « secure » / « not secure » au lieu de equals(%p,443) / equals(%p,80),
 # pour que HSTS et la redirection fonctionnent aussi en dev (8080 / 8443)
 if (outcome != success) of /subsystem=undertow/server=default-server/host=default-host/filter-ref=hsts-header:read-resource
@@ -122,4 +142,5 @@ if (outcome != success) of /subsystem=undertow/server=default-server/host=defaul
     /subsystem=undertow/server=default-server/host=default-host/filter-ref="Access-Control-Max-Age":add(predicate=$escaped)
 end-if
 
+# Les modifications de configuration ne sont prises en compte qu'après rechargement du serveur
 reload
