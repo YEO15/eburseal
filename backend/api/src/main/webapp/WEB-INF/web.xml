@@ -5,6 +5,14 @@
          version="6.1">
     <display-name>EburSeal</display-name>
 
+    <!-- SR-AUZ-01 : @RolesAllowed / @PermitAll / @DenyAll are enforced by RESTEasy.
+         Without this parameter WildFly ignores them on plain REST resources:
+         POST /api/diplomas was callable without authentication (201 Created). -->
+    <context-param>
+        <param-name>resteasy.role.based.security</param-name>
+        <param-value>true</param-value>
+    </context-param>
+
     <!-- SR-AUZ-01 : toute méthode HTTP non couverte par une contrainte est refusée -->
     <deny-uncovered-http-methods/>
 
